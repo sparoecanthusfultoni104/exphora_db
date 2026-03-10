@@ -1,0 +1,48 @@
+[package]
+name = "exphora_db"
+version = "0.6.0"
+edition = "2021"
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-dialog = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+csv       = "1.3"
+
+# P2P module dependencies
+zstd      = "0.13"
+sha2      = "0.10"
+hex       = "0.4"
+base64    = "0.22"
+uuid      = { version = "1", features = ["v4"] }
+snow      = "0.9"
+thiserror = "1.0"
+dirs      = "5.0"
+tokio     = { version = "1", features = ["net", "io-util", "rt-multi-thread", "macros", "sync", "time"] }
+
+# NAT traversal (STUN discovery + raw socket control)
+stun_codec = "0.3"
+bytecodec  = "0.4"
+socket2    = { version = "0.5", features = ["all"] }
+
+# v0.5.0 multi-format support
+rusqlite        = { version = "0.32", features = ["bundled"] }
+quick-xml       = { version = "0.36", features = ["serialize"] }
+rust_xlsxwriter = "0.75"
+printpdf        = "0.7"
+chrono          = { version = "0.4", features = ["std", "clock"] }
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+chrono = { version = "0.4", features = ["std", "clock"] }
+
+[dev-dependencies]
+tempfile = "3"
+
+[profile.release]
+opt-level = 2
+
+[[bin]]
+name = "exphora_db"
+path = "src/main.rs"

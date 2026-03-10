@@ -1,0 +1,13 @@
+{
+    "$schema": "../ui/node_modules/@tauri-apps/cli/schema/capabilities.json",
+    "identifier": "default",
+    "description": "Default capabilities for ExphoraDB",
+    "windows": [
+        "main"
+    ],
+    "permissions": [
+        "core:default",
+        "dialog:default",
+        "dialog:allow-open"
+    ]
+}
