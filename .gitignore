@@ -32,6 +32,8 @@ pnpm-debug.log*
 cargo.log*
 
 # Editor / IDE
+.antigravity
+.antigravity/*
 .vscode/*
 !.vscode/extensions.json
 !.vscode/settings.json

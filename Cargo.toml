@@ -33,6 +33,9 @@ rust_xlsxwriter = "0.75"
 printpdf        = "0.7"
 chrono          = { version = "0.4", features = ["std", "clock"] }
 
+[target.'cfg(windows)'.dependencies]
+winreg = "0.52"
+
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 chrono = { version = "0.4", features = ["std", "clock"] }

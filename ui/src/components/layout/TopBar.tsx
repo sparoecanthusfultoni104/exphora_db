@@ -15,6 +15,7 @@ import {
 import { AppInfo } from "../../types";
 import { useAppStore } from "../../store/appStore";
 import { useDataset } from "../../hooks/useDataset";
+import { RelinkModal } from "../modals/RelinkModal";
 
 interface TopBarProps {
     onToggleSettings: () => void;
@@ -24,6 +25,8 @@ interface TopBarProps {
 export function TopBar({ onToggleSettings, onToggleP2P }: TopBarProps) {
     const [appInfo, setAppInfo] = useState<AppInfo>({ version: "", build_date: "" });
     const [showExport, setShowExport] = useState(false);
+    const [showOpen, setShowOpen] = useState(false);
+    const [relinkViewPath, setRelinkViewPath] = useState<string | null>(null);
     const theme = useAppStore((s) => s.theme);
     const setTheme = useAppStore((s) => s.setTheme);
     const activeTabId = useAppStore((s) => s.activeTabId);
@@ -76,6 +79,24 @@ export function TopBar({ onToggleSettings, onToggleP2P }: TopBarProps) {
         }
     };
 
+    const handleLoadView = async (path: string) => {
+        try {
+            const viewFile: any = await invoke("load_view", { filePath: path });
+            const newTabs = await invoke<any[]>("load_file", { path: viewFile.view.datasetPath });
+            if (newTabs.length === 0) return;
+            useAppStore.getState().addTabs(newTabs);
+            const { fromViewState } = await import("../../types");
+            useAppStore.getState().updateTabUi(newTabs[0].id, fromViewState(viewFile.view));
+        } catch (err: any) {
+            const errStr = typeof err === "string" ? err : JSON.stringify(err);
+            if (errStr.includes("DATASET_NOT_FOUND")) {
+                setRelinkViewPath(path);
+            } else {
+                alert(`Error loading view: ${errStr}`);
+            }
+        }
+    };
+
     return (
         <div className="flex items-center gap-2 px-3 py-1.5 border-b border-zinc-800 bg-zinc-900 select-none shrink-0" style={{ height: 46 }}>
             {/* App title */}
@@ -93,11 +114,37 @@ export function TopBar({ onToggleSettings, onToggleP2P }: TopBarProps) {
                 </div>
             </div>
 
-            {/* Open file */}
-            <button className="btn" tabIndex={0} onClick={openFile} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") openFile(); }} title="Open file (Ctrl+O)">
-                <FolderOpen size={14} />
-                <span>Open</span>
-            </button>
+            {/* Open Dropdown */}
+            <div className="relative">
+                <button className="btn" tabIndex={0} onClick={() => setShowOpen((v) => !v)} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") setShowOpen((v) => !v); }} title="Open (Ctrl+O)">
+                    <FolderOpen size={14} />
+                    <span>Open</span>
+                </button>
+                {showOpen && (
+                    <div
+                        className="context-menu absolute top-full left-0 mt-1 animate-fade-in"
+                        onMouseLeave={() => setShowOpen(false)}
+                    >
+                        <div className="context-menu-item" onClick={() => { setShowOpen(false); openFile(); }}>
+                            Open file
+                        </div>
+                        <div className="context-menu-item" onClick={async () => {
+                            setShowOpen(false);
+                            try {
+                                const { open } = await import("@tauri-apps/plugin-dialog");
+                                const path = await open({ filters: [{ name: "Exphora View", extensions: ["exh"] }] });
+                                if (typeof path === "string") {
+                                    handleLoadView(path);
+                                }
+                            } catch (e) {
+                                alert(e);
+                            }
+                        }}>
+                            Open view (.exh)
+                        </div>
+                    </div>
+                )}
+            </div>
 
             {/* Export dropdown */}
             {activeTab && (
@@ -191,6 +238,17 @@ export function TopBar({ onToggleSettings, onToggleP2P }: TopBarProps) {
             <button className="btn ghost" tabIndex={0} onClick={onToggleSettings} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") onToggleSettings(); }} title="Settings">
                 <Settings size={14} />
             </button>
+
+            {relinkViewPath && (
+                <RelinkModal
+                    viewFilePath={relinkViewPath}
+                    onClose={() => setRelinkViewPath(null)}
+                    onRelinkSuccess={(viewFile) => {
+                        setRelinkViewPath(null);
+                        handleLoadView(relinkViewPath);
+                    }}
+                />
+            )}
         </div>
     );
 }
