@@ -14,6 +14,63 @@ const COL_WIDTH = 140;
 const ROW_HEIGHT = 22;
 const HDR_HEIGHT = 32;
 
+interface ParsedCondition {
+    field: string | null;
+    value: string;
+}
+
+function parseSearchQuery(query: string): ParsedCondition[] {
+    if (!query.trim()) return [];
+    const conditions: ParsedCondition[] = [];
+    const fieldRegex =
+        /(\w+):\s*"([^"]*)"|(\w+):\s*([^,"\s]+)/g;
+    let match;
+    let hasFieldMatch = false;
+
+    while ((match = fieldRegex.exec(query)) !== null) {
+        hasFieldMatch = true;
+        const field = match[1] ?? match[3];
+        const value = match[2] !== undefined
+            ? match[2]
+            : (match[4] ?? "");
+        if (field && value) {
+            conditions.push({ field, value });
+        }
+    }
+
+    if (!hasFieldMatch) {
+        conditions.push({ field: null, value: query.trim() });
+    }
+
+    return conditions;
+}
+
+function highlightText(
+    text: string,
+    query: string
+): React.ReactNode {
+    if (!text || !query || !query.trim()) return text;
+    const escaped = query.replace(
+        /[.*+?^${}()|[\]\\]/g, '\\$&');
+    const regex = new RegExp(`(${escaped})`, 'gi');
+    const parts = text.split(regex);
+    if (parts.length === 1) return text;
+    return (
+        <>
+            {parts.map((part, i) =>
+                i % 2 === 1 ? (
+                    <span key={i} style={{
+                        background: 'var(--color-warning)',
+                        color: 'var(--color-bg)',
+                        borderRadius: 'var(--radius-sm)',
+                        padding: '0 2px'
+                    }}>{part}</span>
+                ) : part
+            )}
+        </>
+    );
+}
+
 interface ContextMenu {
     x: number;
     y: number;
@@ -84,15 +141,44 @@ export function DataTable({ tabId }: { tabId: string }) {
     const unfrozenCols = visibleCols.filter((c) => !frozenCols.includes(c));
 
     const filteredIndices = ui.filteredIndices;
-    const textSearch = ui.textSearch.toLowerCase();
+    const textSearch = (ui.textSearch || "").trim();
+    
+    const conditions = parseSearchQuery(textSearch);
+
+    const highlight = (val: string, col: string) => {
+        if (!conditions.length || !val) return val;
+        const matching = conditions.filter(({ field, value }) => {
+            if (!value) return false;
+            if (field) {
+                return field.toLowerCase() === col.toLowerCase();
+            }
+            return true; // búsqueda global resalta en todo
+        });
+        if (!matching.length) return val;
+        // Resaltar la primera condición que aplica
+        return highlightText(val, matching[0].value);
+    };
 
     // Filter by text search if active
-    const displayIndices = textSearch
+    const displayIndices = conditions.length > 0
         ? filteredIndices.filter((idx) => {
-            const rec = tab.records[idx];
-            return visibleCols.some((c) => {
-                const v = String((rec as Record<string, unknown>)[c] ?? "").toLowerCase();
-                return v.includes(textSearch);
+            const rec = tab.records[idx] as Record<string, unknown>;
+            return conditions.every(({ field, value }) => {
+                if (!value) return true;
+                const valLower = value.toLowerCase();
+                if (field) {
+                    const actualCol = Object.keys(rec).find(
+                        k => k.toLowerCase() === field.toLowerCase()
+                    ) ?? field;
+                    return String(rec[actualCol] ?? "")
+                        .toLowerCase()
+                        .includes(valLower);
+                }
+                return visibleCols.some(c =>
+                    String(rec[c] ?? "")
+                        .toLowerCase()
+                        .includes(valLower)
+                );
             });
         })
         : filteredIndices;
@@ -294,7 +380,7 @@ export function DataTable({ tabId }: { tabId: string }) {
                                                             }}
                                                         />
                                                     ) : (
-                                                        val || <em>null</em>
+                                                        val ? highlight(val, c) : <em>null</em>
                                                     )}
                                                 </div>
                                             );
@@ -377,7 +463,7 @@ export function DataTable({ tabId }: { tabId: string }) {
                                                         }}
                                                     />
                                                 ) : (
-                                                    val || <em>null</em>
+                                                    val ? highlight(val, c) : <em>null</em>
                                                 )}
                                             </div>
                                         );

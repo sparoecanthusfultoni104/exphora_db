@@ -1,3 +1,5 @@
+// ui/src/types/index.ts
+
 // ── Serializable types mirroring the Rust backend ────────────────────────────
 
 export interface LoadedTab {
@@ -77,6 +79,21 @@ export interface UniqueValuesResult {
 
 // ── Per-tab UI state (managed in frontend only) ───────────────────────────────
 
+export interface ViewState {
+    datasetPath: string;
+    filters: Record<string, FilterRule[]> | any;
+    textSearch: string;
+    visibleColumns: Record<string, boolean>;
+    frozenCols: string[];
+    calcCols: { name: string; expr: string }[];
+    sortCol: string | null;
+    sortAsc: boolean;
+    showFrequencyChart: boolean;
+    frequencyChartCol: string | null;
+    charts: any | null;
+    notes: string;
+}
+
 export interface TabUiState {
     filteredIndices: number[];
     filters: DynamicFiltersDto;
@@ -100,6 +117,8 @@ export interface TabUiState {
     };
     saveStatus: 'idle' | 'saving' | 'saved' | 'error';
     editedCells: Record<string, boolean>; // key format: `${rowIndex}-${colName}`
+    notes: string;
+    savedViewPath?: string;
 }
 
 export function defaultTabUiState(tab: LoadedTab): TabUiState {
@@ -128,5 +147,41 @@ export function defaultTabUiState(tab: LoadedTab): TabUiState {
         editHistory: { past: [], future: [] },
         saveStatus: 'idle',
         editedCells: {},
+        notes: "",
+    };
+}
+
+export function toViewState(tab: LoadedTab, ui: TabUiState): ViewState {
+    if (!tab.path) {
+        throw new Error("Cannot save a view for a tab without a file path.");
+    }
+    return {
+        datasetPath: tab.path,
+        filters: JSON.parse(JSON.stringify(ui.filters)),
+        textSearch: ui.textSearch,
+        visibleColumns: { ...ui.visibleColumns },
+        frozenCols: [...ui.frozenCols],
+        calcCols: ui.calcCols.map(c => ({ ...c })),
+        sortCol: ui.sortCol,
+        sortAsc: ui.sortAsc,
+        showFrequencyChart: ui.showFrequencyChart,
+        frequencyChartCol: ui.frequencyChartCol,
+        charts: null,
+        notes: ui.notes,
+    };
+}
+
+export function fromViewState(view: ViewState): Partial<TabUiState> {
+    return {
+        filters: JSON.parse(JSON.stringify(view.filters)),
+        textSearch: view.textSearch,
+        visibleColumns: { ...view.visibleColumns },
+        frozenCols: [...view.frozenCols],
+        calcCols: view.calcCols.map(c => ({ ...c })),
+        sortCol: view.sortCol,
+        sortAsc: view.sortAsc,
+        showFrequencyChart: view.showFrequencyChart,
+        frequencyChartCol: view.frequencyChartCol,
+        notes: view.notes,
     };
 }
