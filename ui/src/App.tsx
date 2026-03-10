@@ -9,6 +9,7 @@ import { P2PPanel } from "./components/p2p/P2PPanel";
 import { SettingsWindow } from "./components/settings/SettingsWindow";
 import { ColumnPickerModal } from "./components/modals/ColumnPickerModal";
 import { ExportPickerModal } from "./components/modals/ExportPickerModal";
+import { NotesPanel } from "./components/notes/NotesPanel";
 import { useAppStore } from "./store/appStore";
 import { useDataset } from "./hooks/useDataset";
 
@@ -18,6 +19,7 @@ export default function App() {
     const [showSidebar, setShowSidebar] = useState(true);
     const [showColumnPicker, setShowColumnPicker] = useState<false | { action: "filter" | "stats" | "chart" }>(false);
     const [showExportPicker, setShowExportPicker] = useState(false);
+    const [showNotes, setShowNotes] = useState(false);
 
     const activeTabId = useAppStore((s) => s.activeTabId);
     const tabs = useAppStore((s) => s.tabs);
@@ -185,7 +187,31 @@ export default function App() {
                             </button>
                         </div>
                     ) : activeTabId ? (
-                        <DataTable key={activeTabId} tabId={activeTabId} />
+                        <div className="flex-1 flex flex-col overflow-hidden relative">
+                            <DataTable key={activeTabId} tabId={activeTabId} />
+
+                            {/* Notes toggle button */}
+                            <div className="bg-zinc-950 border-t border-zinc-800 px-3 py-1 flex justify-start shrink-0 z-10">
+                                <button
+                                    onClick={() => setShowNotes(!showNotes)}
+                                    className="text-xs font-medium text-zinc-400 hover:text-zinc-200 flex items-center gap-1.5 transition-colors"
+                                >
+                                    {(ui?.notes?.trim() || "") !== "" && (
+                                        <div className="w-1.5 h-1.5 rounded-full bg-violet-500 shrink-0" />
+                                    )}
+                                    Notes
+                                </button>
+                            </div>
+
+                            {/* Notes Panel */}
+                            {showNotes && ui && (
+                                <NotesPanel 
+                                    tabId={activeTabId} 
+                                    notes={ui.notes || ""} 
+                                    onChange={(val) => updateTabUi(activeTabId, { notes: val })} 
+                                />
+                            )}
+                        </div>
                     ) : null}
                 </div>
             </div>

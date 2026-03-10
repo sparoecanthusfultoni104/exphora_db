@@ -167,7 +167,7 @@ export function toViewState(tab: LoadedTab, ui: TabUiState): ViewState {
         showFrequencyChart: ui.showFrequencyChart,
         frequencyChartCol: ui.frequencyChartCol,
         charts: null,
-        notes: "",
+        notes: ui.notes,
     };
 }
 

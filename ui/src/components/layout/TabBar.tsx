@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { X, Save, ChevronDown } from "lucide-react";
 import { useAppStore } from "../../store/appStore";
 import { useDataset } from "../../hooks/useDataset";
@@ -15,6 +15,21 @@ export function TabBar() {
 
     const [saveLabel, setSaveLabel] = useState<string>("Save view");
     const [toastMsg, setToastMsg] = useState<string | null>(null);
+
+    const savedNotesRef = useRef<Record<string, string>>({});
+
+    useEffect(() => {
+        const activeIds = new Set(tabs.map(t => t.id));
+        tabs.forEach(tab => {
+            const ui = tabUiStateMap[tab.id];
+            if (ui && !(tab.id in savedNotesRef.current)) {
+                savedNotesRef.current[tab.id] = ui.notes || "";
+            }
+        });
+        Object.keys(savedNotesRef.current).forEach(id => {
+            if (!activeIds.has(id)) delete savedNotesRef.current[id];
+        });
+    }, [tabs, tabUiStateMap]);
 
     // Ctrl+W closes active tab
     useEffect(() => {
@@ -33,7 +48,7 @@ export function TabBar() {
     const handleSaveView = async (saveAs: boolean = false) => {
         if (!activeTabId) return;
         const activeTab = tabs.find(t => t.id === activeTabId);
-        const activeUi = tabUiStateMap[activeTabId];
+        const activeUi = useAppStore.getState().tabUi[activeTabId]; // Fetch live state, bypass closure
         if (!activeTab || !activeUi) return;
 
         let viewState;
@@ -57,6 +72,7 @@ export function TabBar() {
             });
 
             updateTabUi(activeTabId, { savedViewPath: savedPath });
+            savedNotesRef.current[activeTabId] = activeUi.notes || "";
 
             const savedViewsJson = localStorage.getItem("exphora_saved_views");
             let savedViews: any[] = savedViewsJson ? JSON.parse(savedViewsJson) : [];
@@ -137,24 +153,34 @@ export function TabBar() {
                             {toastMsg}
                         </span>
                     )}
-                    <div className="flex bg-violet-500/10 border border-violet-500/20 rounded-md overflow-hidden transition-colors hover:bg-violet-500/20">
-                        <button
-                            onClick={() => handleSaveView(false)}
-                            className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-violet-300"
-                        >
-                            <Save size={12} />
-                            {saveLabel}
-                        </button>
-                        {tabUiStateMap[activeTabId]?.savedViewPath && (
-                            <button
-                                onClick={() => handleSaveView(true)}
-                                title="Save as..."
-                                className="flex items-center justify-center px-1.5 py-1 text-violet-300 border-l border-violet-500/20 hover:bg-violet-500/30 transition-colors"
-                            >
-                                <ChevronDown size={12} />
-                            </button>
-                        )}
-                    </div>
+                    {(() => {
+                        const activeUi = tabUiStateMap[activeTabId];
+                        const savedNotes = savedNotesRef.current[activeTabId] || "";
+                        const currentNotes = activeUi?.notes || "";
+                        const hasUnsavedNotes = currentNotes.trim() !== savedNotes.trim();
+
+                        return (
+                            <div className="flex bg-violet-500/10 border border-violet-500/20 rounded-md overflow-hidden transition-colors hover:bg-violet-500/20">
+                                <button
+                                    onClick={() => handleSaveView(false)}
+                                    className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-violet-300 relative"
+                                >
+                                    {hasUnsavedNotes && <span className="absolute left-1 top-1 w-1.5 h-1.5 rounded-full bg-orange-400" />}
+                                    <Save size={12} />
+                                    {saveLabel}
+                                </button>
+                                {activeUi?.savedViewPath && (
+                                    <button
+                                        onClick={() => handleSaveView(true)}
+                                        title="Save as..."
+                                        className="flex items-center justify-center px-1.5 py-1 text-violet-300 border-l border-violet-500/20 hover:bg-violet-500/30 transition-colors"
+                                    >
+                                        <ChevronDown size={12} />
+                                    </button>
+                                )}
+                            </div>
+                        );
+                    })()}
                 </div>
             )}
         </div>

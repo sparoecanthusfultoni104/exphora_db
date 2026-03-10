@@ -1,6 +1,6 @@
 {
   "productName": "ExphoraDB",
-  "version": "0.6.3",
+  "version": "0.7.1",
   "identifier": "com.exphoradb.app",
   "build": {
     "frontendDist": "ui/dist",

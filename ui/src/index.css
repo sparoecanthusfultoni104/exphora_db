@@ -446,3 +446,34 @@ input[type="checkbox"] {
   --color-row-selected: rgba(139, 92, 246, 0.15);
   --color-header-bg: #f4f4f5;
 }
+
+/* ── Markdown Editor Overrides ──────────────────────────────────────────────── */
+.w-md-editor {
+  background-color: transparent !important;
+  color: var(--color-text-primary) !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.w-md-editor-text-pre > code,
+.w-md-editor-text-input,
+.wmde-markdown {
+  color: var(--color-text-primary) !important;
+  font-family: inherit !important;
+  font-size: 13px !important;
+}
+
+.wmde-markdown, .wmde-markdown-custom {
+  background-color: transparent !important;
+  color: var(--color-text-primary) !important;
+}
+
+.w-md-editor-preview {
+  background-color: transparent !important;
+  box-shadow: -1px 0 0 0 var(--color-border) inset !important;
+}
+
+.w-md-editor-toolbar {
+  background-color: var(--color-app-bg) !important;
+  border-bottom: 1px solid var(--color-border) !important;
+}

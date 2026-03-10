@@ -1,6 +1,6 @@
 [package]
 name = "exphora_db"
-version = "0.6.3"
+version = "0.7.1"
 edition = "2021"
 
 [dependencies]
