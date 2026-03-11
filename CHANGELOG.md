@@ -1,16 +1,10 @@
-## v0.7.1 — 2026-03-10
-
+## v0.7.2 — 2026-03-11
 ### Added
-- View system (.exh files): save and restore complete tab state including filters, column config, sort, and notes
-- Save view button in TabBar with Save / Save As behavior
-- Views section in Sidebar listing saved views per session
-- Open view (.exh) option in TopBar file menu
-- RelinkModal: re-link views when dataset file has been moved
-- Notes panel with markdown editor and preview (Edit / Split / Preview modes)
-- Resizable notes panel with drag handle
-- Auto-indicator on Save view button when notes have unsaved changes
-- .exh file icon registered in Windows Explorer
-- .exh file association registered in Windows registry on app launch
-
-### Fixed
-- Search highlight and column-specific field:value filters (carried from v0.6.3 fixes)
+- Sistema de vistas .exh con persistencia completa (filtros, columnas, gráficos)
+- Smart Save: guardado directo sin diálogo si ya existe ruta
+- Recent Views en Sidebar
+- RelinkModal: re-vincular vistas con dataset movido (SHA-256)
+- Ventana flotante de notas markdown por vista (draggable, Code/Preview/Both)
+- Notas por columna con indicador y tooltip en headers
+- Nombre sugerido automático al guardar primera vez
+- Landing page fix: DOCTYPE faltante
