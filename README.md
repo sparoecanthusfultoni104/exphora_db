@@ -3,7 +3,7 @@
 A fast, lightweight dataset viewer and explorer for your desktop.
 Open your data, filter it, analyze it, share it — no cloud required.
 
-![Version](https://img.shields.io/badge/version-v0.7.1-purple)
+![Version](https://img.shields.io/badge/version-v0.7.2-purple)
 ![Platform](https://img.shields.io/badge/platform-Windows_11_Pro-lightgrey)
 
 ---
@@ -36,7 +36,7 @@ Open, explore and export all of these:
 
 Export to: CSV, JSON, Excel, Markdown, PDF.
 
-*(**Pro tip**: the new `.exh` format acts as a saved workspace for your session, preserving filter configs, customized column widths and visibility, dataset paths, and even dedicated **markdown notes** mapped exactly to your view.)*
+*(**Pro tip**: the `.exh` format acts as a complete saved workspace for your session, seamlessly preserving active filters, column configurations, chart states, and dataset paths. It also features **floating markdown notes** per view, **column annotations**, Smart Save, and native OS file associations.)*
 
 ---
 
@@ -51,6 +51,7 @@ Native OS integration via Tauri. Handles file I/O, schema inference
 
 **`ui/src/` — React frontend**
 Modular SPA split into:
+
 - `components/` — virtualized tables, sidebars, modals, overlays, charts
 - `hooks/` — `useDataset`, `useFilters`, `useFocusTrap`, `useAutoSave` and more
 - `store/` — global tab state via Zustand (`appStore.ts`)
@@ -97,7 +98,6 @@ Full keyboard navigation. Mouse optional.
 | `Ctrl + Z` | Undo last edit |
 | `Ctrl + X` | Redo last undone edit |
 
-
 ### App
 
 | Shortcut | Action |
@@ -123,9 +123,10 @@ cargo tauri dev
 npx @tauri-apps/cli build
 
 ```
-## Test 
+
+## Test
+
 ```bash
 cargo test
 # 37 passed, 0 failed
 ```
-

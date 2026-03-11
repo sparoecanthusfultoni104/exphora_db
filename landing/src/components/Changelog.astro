@@ -2,16 +2,20 @@
 // src/components/Changelog.astro
 const updates = [
   {
-    version: "v0.7.1",
-    date: "March 10, 2026",
+    version: "v0.7.2",
+    date: "March 11, 2026",
     title: "Views, Persistence & Notes Panel",
-    description: "The biggest productivity update out yet. Introducing Exphora Views and Markdown notes.",
+    description: "The biggest productivity update yet. Introducing Exphora Views, Smart Save, floating Markdown notes, and column annotations.",
     changes: [
-      { type: "Added", text: "View system (.exh files): seamlessly save and restore complete tab states. This captures your exact active filters, column configurations, sorting statuses, and markdown notes directly to disk so you pick up exactly where you left off." },
-      { type: "Added", text: "Notes panel with complete markdown editor and preview capabilities. Designed specifically to annotate datasets without ever leaving the application (modes: Edit / Split / Preview)." },
-      { type: "Added", text: "New 'Views' section integrated directly into your Sidebar, caching and organizing all views generated per session for effortless switching." },
-      { type: "Added", text: "Built-in RelinkModal: beautifully handles restoring your views in the event the underlying dataset document has been moved or renamed." },
-      { type: "Added", text: "Full native OS integration for .exh associations—open views instantly through Windows Explorer." },
+      { type: "Added", text: "View system (.exh files): seamlessly save and restore complete tab states including active filters, column configurations, sorting, calculated columns, pinned columns, and chart states directly to disk." },
+      { type: "Added", text: "Smart Save: after saving a view once, the Save button writes directly to the same file without reopening the dialog. A secondary (...) button lets you save to a new location anytime." },
+      { type: "Added", text: "Automatic filename suggestion: when saving a view for the first time, the OS dialog pre-fills the name based on the active dataset (e.g. ventas_2025.exh)." },
+      { type: "Added", text: "Floating Markdown notes panel per view: a freely draggable, resizable window with Code, Preview, and Split modes. Notes persist inside the .exh file." },
+      { type: "Added", text: "Column annotations: add short notes to any column directly from the header context menu. A discrete dot indicator and tooltip appear on annotated columns. Persisted inside the .exh file." },
+      { type: "Added", text: "Recent Views section in the Sidebar: tracks the last opened views across sessions for quick access." },
+      { type: "Added", text: "RelinkModal: when a view's underlying dataset has been moved or renamed, ExphoraDB detects it and lets you locate the file manually to restore the session." },
+      { type: "Added", text: "Native .exh file association on Windows: open any saved view directly from Explorer." },
+      { type: "Fixed", text: "Landing page blank screen caused by missing <!DOCTYPE html> declaration (Tailwind v4 Quirks Mode regression)." },
       { type: "Fixed", text: "Resolved deep search highlight overlaps and column-specific field:value filter logic regressions." }
     ]
   }

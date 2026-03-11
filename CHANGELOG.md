@@ -1,4 +1,5 @@
 ## v0.7.2 — 2026-03-11
+
 ### Added
 - Sistema de vistas .exh con persistencia completa (filtros, columnas, gráficos)
 - Smart Save: guardado directo sin diálogo si ya existe ruta
