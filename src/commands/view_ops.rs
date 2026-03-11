@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
+use std::collections::HashMap;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -27,6 +28,9 @@ pub struct ViewFile {
     pub app_version: String,
     pub created_at: String,
     pub view: ViewState,
+    pub saved_path: Option<String>,
+    pub view_notes: Option<String>,
+    pub column_notes: Option<HashMap<String, String>>,
 }
 
 pub fn validate_view_file(view_file: &ViewFile) -> Result<(), String> {
@@ -44,16 +48,21 @@ pub async fn save_view(
     _view_name: String,
     view: ViewState,
     path: Option<String>,
+    default_file_name: Option<String>,
+    view_notes: Option<String>,
+    column_notes: Option<HashMap<String, String>>,
 ) -> Result<String, String> {
+    println!("DEBUG save_view: view_notes='{:?}', column_notes='{:?}'", view_notes, column_notes);
+
     let final_path = match path {
         Some(p) => p,
         None => {
             use tauri_plugin_dialog::DialogExt;
-            let result = app
-                .dialog()
-                .file()
-                .add_filter("Exphora View", &["exh"])
-                .blocking_save_file();
+            let mut dialog = app.dialog().file().add_filter("Exphora View", &["exh"]);
+            if let Some(default_name) = default_file_name {
+                dialog = dialog.set_file_name(&default_name);
+            }
+            let result = dialog.blocking_save_file();
             match result {
                 Some(p) => p.to_string(),
                 None => return Err("Dialog cancelled".to_string()),
@@ -69,11 +78,14 @@ pub async fn save_view(
 
     let created_at = chrono::Utc::now().to_rfc3339();
 
-    let view_file = ViewFile {
+    let mut view_file = ViewFile {
         version: 1,
         app_version: app.package_info().version.to_string(),
         created_at,
         view,
+        saved_path: Some(actual_path.clone()),
+        view_notes,
+        column_notes,
     };
 
     let json = serde_json::to_string_pretty(&view_file).map_err(|e| e.to_string())?;
@@ -109,6 +121,7 @@ pub async fn relink_view(
     let mut view_file: ViewFile = serde_json::from_str(&content).map_err(|e| e.to_string())?;
 
     view_file.view.dataset_path = new_dataset_path.clone();
+    view_file.saved_path = Some(view_file_path.clone());
 
     if !std::path::Path::new(&new_dataset_path).exists() {
         return Err("New dataset path does not exist".to_string());

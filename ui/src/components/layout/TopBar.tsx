@@ -86,7 +86,20 @@ export function TopBar({ onToggleSettings, onToggleP2P }: TopBarProps) {
             if (newTabs.length === 0) return;
             useAppStore.getState().addTabs(newTabs);
             const { fromViewState } = await import("../../types");
-            useAppStore.getState().updateTabUi(newTabs[0].id, fromViewState(viewFile.view));
+            useAppStore.getState().updateTabUi(newTabs[0].id, {
+                ...fromViewState(viewFile.view),
+                savedViewPath: viewFile.saved_path || undefined,
+                viewNotes: viewFile.viewNotes || "",
+                columnNotes: viewFile.columnNotes || {}
+            });
+            
+            const name = path.split(/[\\/]/).pop()?.replace(/\.[^/.]+$/, "") || "Unknown";
+            useAppStore.getState().addRecentView({
+                name,
+                path,
+                datasetPath: viewFile.view.datasetPath,
+                openedAt: new Date().toISOString()
+            });
         } catch (err: any) {
             const errStr = typeof err === "string" ? err : JSON.stringify(err);
             if (errStr.includes("DATASET_NOT_FOUND")) {
@@ -245,7 +258,7 @@ export function TopBar({ onToggleSettings, onToggleP2P }: TopBarProps) {
                     onClose={() => setRelinkViewPath(null)}
                     onRelinkSuccess={(viewFile) => {
                         setRelinkViewPath(null);
-                        handleLoadView(relinkViewPath);
+                        if (relinkViewPath) handleLoadView(relinkViewPath);
                     }}
                 />
             )}

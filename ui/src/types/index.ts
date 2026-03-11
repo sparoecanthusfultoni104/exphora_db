@@ -91,7 +91,6 @@ export interface ViewState {
     showFrequencyChart: boolean;
     frequencyChartCol: string | null;
     charts: any | null;
-    notes: string;
 }
 
 export interface TabUiState {
@@ -117,7 +116,8 @@ export interface TabUiState {
     };
     saveStatus: 'idle' | 'saving' | 'saved' | 'error';
     editedCells: Record<string, boolean>; // key format: `${rowIndex}-${colName}`
-    notes: string;
+    viewNotes: string;
+    columnNotes: Record<string, string>;
     savedViewPath?: string;
 }
 
@@ -147,7 +147,8 @@ export function defaultTabUiState(tab: LoadedTab): TabUiState {
         editHistory: { past: [], future: [] },
         saveStatus: 'idle',
         editedCells: {},
-        notes: "",
+        viewNotes: "",
+        columnNotes: {}
     };
 }
 
@@ -166,8 +167,7 @@ export function toViewState(tab: LoadedTab, ui: TabUiState): ViewState {
         sortAsc: ui.sortAsc,
         showFrequencyChart: ui.showFrequencyChart,
         frequencyChartCol: ui.frequencyChartCol,
-        charts: null,
-        notes: ui.notes,
+        charts: null
     };
 }
 
@@ -181,7 +181,13 @@ export function fromViewState(view: ViewState): Partial<TabUiState> {
         sortCol: view.sortCol,
         sortAsc: view.sortAsc,
         showFrequencyChart: view.showFrequencyChart,
-        frequencyChartCol: view.frequencyChartCol,
-        notes: view.notes,
+        frequencyChartCol: view.frequencyChartCol
     };
+}
+
+export interface RecentViewEntry {
+    name: string;        // nombre de la vista dado por el usuario
+    path: string;        // ruta absoluta del archivo .exh
+    datasetPath: string; // ruta del dataset asociado
+    openedAt: string;    // ISO 8601 timestamp
 }

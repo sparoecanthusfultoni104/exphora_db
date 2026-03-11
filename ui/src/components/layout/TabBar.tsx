@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { X, Save, ChevronDown } from "lucide-react";
+import { X, Save, MoreHorizontal, FileText } from "lucide-react";
 import { useAppStore } from "../../store/appStore";
 import { useDataset } from "../../hooks/useDataset";
 import { toViewState } from "../../types";
@@ -11,6 +11,7 @@ export function TabBar() {
     const tabUiStateMap = useAppStore((s) => s.tabUi);
     const setActiveTab = useAppStore((s) => s.setActiveTab);
     const updateTabUi = useAppStore((s) => s.updateTabUi);
+    const toggleNotesWindow = useAppStore((s) => s.toggleNotesWindow);
     const { closeTab } = useDataset();
 
     const [saveLabel, setSaveLabel] = useState<string>("Save view");
@@ -23,7 +24,7 @@ export function TabBar() {
         tabs.forEach(tab => {
             const ui = tabUiStateMap[tab.id];
             if (ui && !(tab.id in savedNotesRef.current)) {
-                savedNotesRef.current[tab.id] = ui.notes || "";
+                savedNotesRef.current[tab.id] = ui.viewNotes || "";
             }
         });
         Object.keys(savedNotesRef.current).forEach(id => {
@@ -64,15 +65,24 @@ export function TabBar() {
             setSaveLabel("Saving...");
             const targetPath = (!saveAs && activeUi.savedViewPath) ? activeUi.savedViewPath : null;
 
+            let defaultFileName = undefined;
+            if (!targetPath && viewState.datasetPath) {
+                const base = viewState.datasetPath.split(/[\\/]/).pop()?.replace(/\.[^/.]+$/, "");
+                if (base) defaultFileName = `${base}.exh`;
+            }
+
             const savedPath = await invoke<string>("save_view", {
                 tabId: activeTabId,
                 viewName: activeTab.name,
                 view: viewState,
-                path: targetPath
+                path: targetPath,
+                defaultFileName,
+                viewNotes: activeUi.viewNotes || null,
+                columnNotes: Object.keys(activeUi.columnNotes).length > 0 ? activeUi.columnNotes : null
             });
 
             updateTabUi(activeTabId, { savedViewPath: savedPath });
-            savedNotesRef.current[activeTabId] = activeUi.notes || "";
+            savedNotesRef.current[activeTabId] = activeUi.viewNotes || "";
 
             const savedViewsJson = localStorage.getItem("exphora_saved_views");
             let savedViews: any[] = savedViewsJson ? JSON.parse(savedViewsJson) : [];
@@ -86,14 +96,15 @@ export function TabBar() {
             localStorage.setItem("exphora_saved_views", JSON.stringify(savedViews));
             window.dispatchEvent(new Event("exphora-views-updated"));
 
-            setSaveLabel("View saved");
+            setSaveLabel("Saved");
             setTimeout(() => setSaveLabel("Save view"), 2000);
         } catch (err) {
             if (err !== "Dialog cancelled") {
-                setToastMsg(`Error: ${err}`);
-                setTimeout(() => setToastMsg(null), 3000);
+                setSaveLabel("Save failed");
+                setTimeout(() => setSaveLabel("Save view"), 3000);
+            } else {
+                setSaveLabel("Save view");
             }
-            setSaveLabel("Save view");
         }
     };
 
@@ -156,14 +167,14 @@ export function TabBar() {
                     {(() => {
                         const activeUi = tabUiStateMap[activeTabId];
                         const savedNotes = savedNotesRef.current[activeTabId] || "";
-                        const currentNotes = activeUi?.notes || "";
+                        const currentNotes = activeUi?.viewNotes || "";
                         const hasUnsavedNotes = currentNotes.trim() !== savedNotes.trim();
 
                         return (
                             <div className="flex bg-violet-500/10 border border-violet-500/20 rounded-md overflow-hidden transition-colors hover:bg-violet-500/20">
                                 <button
                                     onClick={() => handleSaveView(false)}
-                                    className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-violet-300 relative"
+                                    className={`flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium text-violet-300 relative ${activeUi?.savedViewPath ? "" : "w-full justify-center"}`}
                                 >
                                     {hasUnsavedNotes && <span className="absolute left-1 top-1 w-1.5 h-1.5 rounded-full bg-orange-400" />}
                                     <Save size={12} />
@@ -175,12 +186,20 @@ export function TabBar() {
                                         title="Save as..."
                                         className="flex items-center justify-center px-1.5 py-1 text-violet-300 border-l border-violet-500/20 hover:bg-violet-500/30 transition-colors"
                                     >
-                                        <ChevronDown size={12} />
+                                        <MoreHorizontal size={12} />
                                     </button>
                                 )}
                             </div>
                         );
                     })()}
+                    
+                    <button
+                        onClick={toggleNotesWindow}
+                        className="p-1 px-2.5 ml-1 text-xs text-zinc-400 hover:text-zinc-200 bg-zinc-800/50 hover:bg-zinc-800 rounded-md border border-zinc-700/50 transition-colors flex items-center gap-1.5"
+                    >
+                        <FileText size={12} /> Notes
+                    </button>
+                    
                 </div>
             )}
         </div>

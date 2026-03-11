@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import { LoadedTab, TabUiState, defaultTabUiState } from "../types";
+import { LoadedTab, TabUiState, defaultTabUiState, RecentViewEntry } from "../types";
 
 interface AppState {
     tabs: LoadedTab[];
@@ -7,6 +7,8 @@ interface AppState {
     tabUi: Record<string, TabUiState>;
     theme: "dark" | "light";
     recentFiles: string[];
+    recentViews: RecentViewEntry[];
+    isNotesWindowOpen: boolean;
 
     // ── Actions ──────────────────────────────────────────────────────────────
     addTabs: (newTabs: LoadedTab[]) => void;
@@ -15,6 +17,8 @@ interface AppState {
     updateTabUi: (id: string, patch: Partial<TabUiState>) => void;
     setTheme: (t: "dark" | "light") => void;
     addRecentFile: (path: string) => void;
+    addRecentView: (entry: RecentViewEntry) => void;
+    toggleNotesWindow: () => void;
 
     // Feature: Inline Editing
     startEditing: (tabId: string, rowIndex: number, colName: string) => void;
@@ -25,12 +29,25 @@ interface AppState {
     setSaveStatus: (tabId: string, status: TabUiState['saveStatus']) => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
-    tabs: [],
-    activeTabId: null,
-    tabUi: {},
-    theme: "dark",
-    recentFiles: [],
+export const useAppStore = create<AppState>((set) => {
+    let initialRecentViews: RecentViewEntry[] = [];
+    try {
+        const stored = localStorage.getItem("recentViews");
+        if (stored) {
+            initialRecentViews = JSON.parse(stored);
+        }
+    } catch (e) {
+        console.warn("Failed to parse recentViews from localStorage", e);
+    }
+
+    return {
+        tabs: [],
+        activeTabId: null,
+        tabUi: {},
+        theme: "dark",
+        recentFiles: [],
+        recentViews: initialRecentViews,
+        isNotesWindowOpen: false,
 
     addTabs: (newTabs) =>
         set((s) => {
@@ -72,6 +89,17 @@ export const useAppStore = create<AppState>((set) => ({
             );
             return { recentFiles: deduped };
         }),
+
+    addRecentView: (entry) =>
+        set((s) => {
+            const filtered = s.recentViews.filter((r) => r.path !== entry.path);
+            const deduped = [entry, ...filtered].slice(0, 20);
+            localStorage.setItem("recentViews", JSON.stringify(deduped));
+            return { recentViews: deduped };
+        }),
+
+    toggleNotesWindow: () =>
+        set((s) => ({ isNotesWindowOpen: !s.isNotesWindowOpen })),
 
     startEditing: (tabId, rowIndex, colName) =>
         set((s) => {
@@ -213,4 +241,5 @@ export const useAppStore = create<AppState>((set) => ({
                 }
             };
         }),
-}));
+    };
+});

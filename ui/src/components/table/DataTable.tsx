@@ -9,6 +9,7 @@ import { useAutoSave } from "../../hooks/useAutoSave";
 import { FilterPanel } from "./FilterPanel";
 import { useFocusTrap } from "../../hooks/useFocusTrap";
 import { RecordDetailsModal } from "../modals/RecordDetailsModal";
+import { FileText, Edit2 } from "lucide-react";
 
 const COL_WIDTH = 140;
 const ROW_HEIGHT = 22;
@@ -105,6 +106,7 @@ export function DataTable({ tabId }: { tabId: string }) {
     const [ctxMenu, setCtxMenu] = useState<ContextMenu | null>(null);
     const [filterPanel, setFilterPanel] = useState<FilterPanelState | null>(null);
     const [addCalcDialog, setAddCalcDialog] = useState<AddCalcColState | null>(null);
+    const [inlineNoteEditor, setInlineNoteEditor] = useState<{ col: string; text: string } | null>(null);
 
     const parentRef = useRef<HTMLDivElement>(null);
     const ctxMenuRef = useRef<HTMLDivElement>(null);
@@ -277,6 +279,14 @@ export function DataTable({ tabId }: { tabId: string }) {
             >
                 {calc && <span className="mr-1 text-violet-400">ƒ</span>}
                 <span className="truncate flex-1">{col}</span>
+                {ui.columnNotes?.[col] && (
+                    <span 
+                        className="ml-1 text-zinc-400 hover:text-zinc-200 cursor-help" 
+                        title={ui.columnNotes[col]}
+                    >
+                        •
+                    </span>
+                )}
                 {sorted && (
                     <span className="ml-1 shrink-0">
                         {ui.sortAsc ? <ChevronUp size={11} /> : <ChevronDown size={11} />}
@@ -532,6 +542,26 @@ export function DataTable({ tabId }: { tabId: string }) {
                         <BarChart2 size={13} /> Frequency Chart
                     </div>
                     <div className="context-menu-sep" />
+                    {!ui.columnNotes?.[ctxMenu.col] ? (
+                        <div tabIndex={0} className="context-menu-item focus:bg-zinc-800 focus:outline-none" onClick={() => { setInlineNoteEditor({ col: ctxMenu.col, text: "" }); setCtxMenu(null); }}>
+                            <FileText size={13} /> Add Note
+                        </div>
+                    ) : (
+                        <>
+                            <div tabIndex={0} className="context-menu-item focus:bg-zinc-800 focus:outline-none" onClick={() => { setInlineNoteEditor({ col: ctxMenu.col, text: ui.columnNotes[ctxMenu.col] }); setCtxMenu(null); }}>
+                                <Edit2 size={13} /> Edit Note
+                            </div>
+                            <div tabIndex={0} className="context-menu-item danger focus:bg-zinc-800 focus:outline-none" onClick={() => { 
+                                const newNotes = { ...ui.columnNotes };
+                                delete newNotes[ctxMenu.col];
+                                updateTabUi(tabId, { columnNotes: newNotes });
+                                setCtxMenu(null); 
+                            }}>
+                                <Trash2 size={13} /> Remove Note
+                            </div>
+                        </>
+                    )}
+                    <div className="context-menu-sep" />
                     <div tabIndex={0} className="context-menu-item focus:bg-zinc-800 focus:outline-none" onClick={() => { toggleFreeze(ctxMenu.col); setCtxMenu(null); }} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { toggleFreeze(ctxMenu.col); setCtxMenu(null); } }}>
                         {frozenCols.includes(ctxMenu.col) ? <><PinOff size={13} /> Unfreeze</> : <><Pin size={13} /> Freeze Column</>}
                     </div>
@@ -616,6 +646,53 @@ export function DataTable({ tabId }: { tabId: string }) {
                     <div className="context-menu-sep" />
                     <div tabIndex={0} className="context-menu-item focus:bg-zinc-800 focus:outline-none" onClick={() => { setDetailsRecordIdx(rowCtxMenu.recordIdx); setRowCtxMenu(null); }} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { setDetailsRecordIdx(rowCtxMenu.recordIdx); setRowCtxMenu(null); } }}>
                         View Record Details
+                    </div>
+                </div>
+            )}
+
+            {/* ── Add Note popover ── */}
+            {inlineNoteEditor !== null && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center animate-fade-in" onClick={() => setInlineNoteEditor(null)}>
+                    <div className="panel p-3 w-80 animate-fade-in" onClick={(e) => e.stopPropagation()}>
+                        <h4 className="text-zinc-300 text-sm font-medium mb-2">Note for {inlineNoteEditor.col}</h4>
+                        <input 
+                            type="text"
+                            autoFocus
+                            placeholder="Type concise note details here..."
+                            className="w-full text-sm font-normal py-1 px-2 border border-zinc-700 bg-zinc-900 rounded-md focus:outline-none focus:border-violet-500 transition-colors"
+                            value={inlineNoteEditor.text}
+                            onChange={(e) => setInlineNoteEditor(prev => prev ? { ...prev, text: e.target.value } : prev)}
+                            onKeyDown={(e) => {
+                                if (e.key === "Enter") {
+                                    if (inlineNoteEditor.text.trim()) {
+                                        updateTabUi(tabId, { columnNotes: { ...(ui.columnNotes || {}), [inlineNoteEditor.col]: inlineNoteEditor.text.trim() } });
+                                    } else {
+                                        const nextNotes = { ...(ui.columnNotes || {}) };
+                                        delete nextNotes[inlineNoteEditor.col];
+                                        updateTabUi(tabId, { columnNotes: nextNotes });
+                                    }
+                                    setInlineNoteEditor(null);
+                                }
+                                if (e.key === "Escape") setInlineNoteEditor(null);
+                            }}
+                        />
+                        <div className="text-right mt-2">
+                            <button 
+                                className="text-xs text-zinc-500 hover:text-zinc-300 btn p-1 h-6" 
+                                onClick={() => {
+                                    if (inlineNoteEditor.text.trim()) {
+                                        updateTabUi(tabId, { columnNotes: { ...(ui.columnNotes || {}), [inlineNoteEditor.col]: inlineNoteEditor.text.trim() } });
+                                    } else {
+                                        const nextNotes = { ...(ui.columnNotes || {}) };
+                                        delete nextNotes[inlineNoteEditor.col];
+                                        updateTabUi(tabId, { columnNotes: nextNotes });
+                                    }
+                                    setInlineNoteEditor(null);
+                                }}
+                            >
+                                Save Note
+                            </button>
+                        </div>
                     </div>
                 </div>
             )}
